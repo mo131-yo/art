@@ -1,26 +1,62 @@
 @import "tailwindcss";
 
+/* Зураач бүрийн palette эдгээр хувьсагчийг inline style-аар дарж бичнэ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --c-bg: #0d0c0a;
+  --c-surface: #1c1a16;
+  --c-accent: #c9a227;
+  --c-text: #f0ece3;
+  --c-muted: #9a917e;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-accent: var(--c-accent);
+  --color-ink: var(--c-text);
+  --color-muted: var(--c-muted);
+  --font-serif-display: var(--font-display), Georgia, serif;
+  --font-sans: var(--font-body), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-body), system-ui, sans-serif;
+  transition: background-color 0.6s ease;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--c-accent);
+  color: var(--c-bg);
+}
+
+/* Нарийхан, palette-ийн өнгөтэй scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--c-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--c-accent) 40%, var(--c-bg));
+  border-radius: 5px;
+}
+
+/* GSAP reveal хийгдэх элементүүд JS ачаалагдахаас өмнө үсрэлтгүй харагдана */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
