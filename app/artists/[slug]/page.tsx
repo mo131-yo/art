@@ -65,7 +65,6 @@ export default async function ArtistPage({
               src={commons(heroWork.fileName, 1280)}
               alt=""
               fill
-              unoptimized
               className="object-cover blur-sm scale-105"
               priority
             />

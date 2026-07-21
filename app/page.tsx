@@ -50,7 +50,6 @@ export default async function Home() {
               alt=""
               width={400}
               height={Math.round(400 / (w.aspect || 1))}
-              unoptimized
               priority
               className="w-full h-auto rounded-sm"
             />

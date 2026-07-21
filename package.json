@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "harvest": "bun run scripts/harvest.ts"
+    "harvest": "bun run scripts/harvest.ts",
+    "smoke": "bun run scripts/smoke.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

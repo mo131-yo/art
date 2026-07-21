@@ -31,7 +31,6 @@ export default function ArtworkCard({ work, artistName, width = 640, priority }:
           alt={label}
           width={width}
           height={Math.round(width / (work.aspect || 1))}
-          unoptimized
           priority={priority}
           loading={priority ? undefined : "lazy"}
           className="w-full h-auto grayscale-[0.15] group-hover:grayscale-0 group-hover:brightness-110 transition-[filter] duration-700"

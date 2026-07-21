@@ -56,7 +56,6 @@ export default async function MovementsPage() {
                       src={commons(m.cover.fileName, 400)}
                       alt=""
                       fill
-                      unoptimized
                       className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                     />
                   )}

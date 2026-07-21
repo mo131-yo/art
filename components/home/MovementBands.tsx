@@ -37,7 +37,6 @@ export default async function MovementBands() {
                 src={commons(m.cover.fileName, 500)}
                 alt=""
                 fill
-                unoptimized
                 className="object-cover opacity-50 grayscale group-hover:opacity-70 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
               />
             )}

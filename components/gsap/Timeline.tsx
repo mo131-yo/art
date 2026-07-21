@@ -50,8 +50,10 @@ export default function Timeline({ events }: { events: TimelineEvent[] }) {
       <div className="tl-line absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-accent/60 md:-translate-x-px" />
       <ol className="space-y-12">
         {events.map((ev, i) => (
+          // Нэг онд хоёр үйл явдал болсон тохиолдол бий (ж: Боттичелли 1482)
+          // тул зөвхөн он key болгоход хангалтгүй.
           <li
-            key={ev.year}
+            key={`${ev.year}-${i}`}
             className={`tl-item relative pl-12 md:pl-0 md:w-[calc(50%-2.5rem)] ${
               i % 2 === 0 ? "md:mr-auto md:text-right" : "md:ml-auto"
             }`}
@@ -59,8 +61,8 @@ export default function Timeline({ events }: { events: TimelineEvent[] }) {
             <span
               className={`absolute left-4 md:left-auto top-1.5 size-3 -translate-x-1/2 rounded-full bg-accent ring-4 ring-accent/20 ${
                 i % 2 === 0
-                  ? "md:right-[-2.5rem] md:translate-x-1/2"
-                  : "md:left-[-2.5rem] md:-translate-x-1/2"
+                  ? "md:-right-10 md:translate-x-1/2"
+                  : "md:-left-10 md:-translate-x-1/2"
               }`}
             />
             <div className="font-serif-display text-accent text-2xl">

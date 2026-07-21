@@ -97,7 +97,6 @@ export default async function ArtworkPage({
                 alt={title}
                 width={1280}
                 height={Math.round(1280 / (work.aspect || 1))}
-                unoptimized
                 priority
                 className="w-full h-auto max-h-[85vh] object-contain bg-raise"
               />

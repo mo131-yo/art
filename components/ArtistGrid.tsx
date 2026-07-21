@@ -57,7 +57,6 @@ export default function ArtistGrid({
                 alt={artist.nameMn}
                 width={450}
                 height={600}
-                unoptimized
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
               />
             </div>

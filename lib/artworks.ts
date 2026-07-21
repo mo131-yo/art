@@ -30,15 +30,29 @@ export type IndexData = {
 // ─────────────────────── Ачаалалт ───────────────────────
 
 /**
- * Зураач бүрийн JSON тусдаа chunk болж, хэрэгтэй үедээ л ачаалагдана.
- * Статик import хийвэл бүх 26,000 бүтээл сервер bundle-д орох байсан.
+ * Ачаалагдсан JSON-ы promise-ыг slug-аар нь хадгална.
+ *
+ * Зөвхөн хурдны төлөө биш: Turbopack dev нэг JSON модулийг ЗЭРЭГ ачаалахад
+ * хагас уншиж «Unexpected end of JSON input» өгдөг (зэрэг 6 хүсэлт явуулж
+ * баталсан; ганцаараа дуудахад үргэлж ажилладаг). Promise-ыг хуваалцсанаар
+ * `import()` slug тутамд яг нэг л удаа дуудагдана.
  */
-async function loadGenerated(slug: string): Promise<GeneratedWork[]> {
-  try {
-    return (await import(`./data/generated/${slug}.json`)).default as GeneratedWork[];
-  } catch {
-    return []; // харвест хийгээгүй зураач — гараар бичсэн бүтээлүүд нь харагдана
+const generatedCache = new Map<string, Promise<GeneratedWork[]>>();
+
+/**
+ * Зураач бүрийн JSON тусдаа chunk болж, хэрэгтэй үедээ л ачаалагдана.
+ * Статик import хийвэл бүх 23,000 бүтээл сервер bundle-д орох байсан.
+ */
+function loadGenerated(slug: string): Promise<GeneratedWork[]> {
+  let pending = generatedCache.get(slug);
+  if (!pending) {
+    pending = import(`./data/generated/${slug}.json`)
+      .then((m) => m.default as GeneratedWork[])
+      // харвест хийгээгүй зураач — гараар бичсэн бүтээлүүд нь харагдана
+      .catch(() => [] as GeneratedWork[]);
+    generatedCache.set(slug, pending);
   }
+  return pending;
 }
 
 // ─────────────────────── Нэгтгэл ───────────────────────
@@ -142,21 +156,43 @@ export async function getArtwork(slug: string, id: string): Promise<Artwork | nu
   return works.find((w) => w.id === id) ?? null;
 }
 
+/** `loadGenerated`-тай ижил шалтгаанаар нэг promise хуваалцана */
+let indexPending: Promise<IndexData> | null = null;
+
 /** Фасетын тоолуур ба хамгийн алдартай 2,000 бүтээл (глобал ухалтад) */
 export async function getIndex(): Promise<IndexData> {
-  "use cache";
-  try {
-    return (await import("./data/generated/index.json")).default as unknown as IndexData;
-  } catch {
-    return { total: 0, perArtist: {}, genres: {}, materials: {}, collections: {}, top: [] };
+  if (!indexPending) {
+    indexPending = import("./data/generated/index.json")
+      .then((m) => m.default as unknown as IndexData)
+      .catch(() => ({
+        total: 0, perArtist: {}, genres: {}, materials: {}, collections: {}, top: [],
+      }));
   }
+  return indexPending;
+}
+
+/**
+ * `index.json`-ийн бичлэгийг `Artwork` болгоно.
+ *
+ * ЧУХАЛ: `fromGenerated`-ыг шууд дуудаж БОЛОХГҮЙ. Гараар бичсэн бүтээлтэй
+ * таарсан бичлэгийн id нь `getArtistWorks` дотор curated slug болж
+ * өөрчлөгддөг (ж. `wd-Q12418` → `mona-lisa`). Шууд хөрвүүлбэл глобал
+ * жагсаалтууд хэзээ ч байхгүй хуудас руу заасан эвдэрсэн линк үүсгэнэ.
+ */
+function fromIndex(g: GeneratedWork & { artist: string }): Artwork {
+  if (g.curatedId) {
+    const artist = getArtist(g.artist);
+    const merged = artist && mergeCurated(artist, g, g.curatedId);
+    if (merged) return merged;
+  }
+  return fromGenerated(g.artist, g);
 }
 
 /** Глобал ухалтад ашиглах бүтээлүүд — бүх зураачийн хамгийн алдартай нь */
 export async function getTopWorks(): Promise<Artwork[]> {
   "use cache";
   const index = await getIndex();
-  return index.top.map((g) => fromGenerated(g.artist, g));
+  return index.top.map(fromIndex);
 }
 
 /** Тухайн зураачийн нийт бүтээлийн тоо (JSON бүхэлд нь ачаалахгүй) */
@@ -180,7 +216,7 @@ export async function getShowcase(limit = 24): Promise<Artwork[]> {
   for (const g of index.top) {
     if (seen.has(g.artist)) continue;
     seen.add(g.artist);
-    out.push(fromGenerated(g.artist, g));
+    out.push(fromIndex(g));
     if (out.length >= limit) break;
   }
   return out;
@@ -202,12 +238,12 @@ export async function getSearchDocs(): Promise<
     hay: `${a.nameMn} ${a.nameOriginal} ${a.movement} ${a.nationality}`.toLowerCase(),
   }));
 
-  const workDocs = index.top.slice(0, 600).map((g) => ({
-    href: `/artists/${g.artist}/artwork/${g.id}`,
-    label: g.title,
-    sub: `${nameOf.get(g.artist) ?? g.artist}${g.year ? ` · ${g.year}` : ""}`,
+  const workDocs = index.top.slice(0, 600).map(fromIndex).map((w) => ({
+    href: `/artists/${w.slug}/artwork/${w.id}`,
+    label: w.titleMn ?? w.title,
+    sub: `${nameOf.get(w.slug) ?? w.slug}${w.year ? ` · ${w.year}` : ""}`,
     kind: "Бүтээл",
-    hay: `${g.title} ${nameOf.get(g.artist) ?? ""}`.toLowerCase(),
+    hay: `${w.title} ${w.titleMn ?? ""} ${nameOf.get(w.slug) ?? ""}`.toLowerCase(),
   }));
 
   return [...artistDocs, ...workDocs];

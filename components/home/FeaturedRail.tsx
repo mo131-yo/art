@@ -39,7 +39,6 @@ export default async function FeaturedRail() {
                     src={commons(w.fileName, 640)}
                     alt={w.title}
                     fill
-                    unoptimized
                     className="object-cover grayscale-[0.15] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
                   />
                 </div>
