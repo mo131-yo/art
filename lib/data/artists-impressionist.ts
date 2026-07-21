@@ -31,8 +31,6 @@ export const impressionistArtists: Artist[] = [
       muted: "#8aa39a",
     },
     portrait: commons("Claude Monet 1899 Nadar crop.jpg", 600),
-    aicMatch: "Monet",
-    aicQuery: "Claude Monet",
     notableWorks: [
       {
         id: "impression-sunrise",
@@ -118,8 +116,6 @@ export const impressionistArtists: Artist[] = [
       muted: "#a08e96",
     },
     portrait: commons("Edgar Degas self portrait 1855.jpeg", 600),
-    aicMatch: "Degas",
-    aicQuery: "Edgar Degas",
     notableWorks: [
       {
         id: "ballet-class",
@@ -205,8 +201,6 @@ export const impressionistArtists: Artist[] = [
       muted: "#a98f98",
     },
     portrait: commons("Renoir, Pierre-Auguste, by Dornac, BNF Gallica.jpg", 600),
-    aicMatch: "Renoir",
-    aicQuery: "Pierre-Auguste Renoir",
     notableWorks: [
       {
         id: "moulin-de-la-galette",
@@ -278,8 +272,6 @@ export const impressionistArtists: Artist[] = [
       muted: "#9a9c80",
     },
     portrait: commons("Paul Cézanne - Self-Portrait - Google Art Project.jpg", 600),
-    aicMatch: "Cezanne",
-    aicQuery: "Paul Cezanne",
     notableWorks: [
       {
         id: "card-players",

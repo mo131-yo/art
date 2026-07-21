@@ -39,6 +39,43 @@ export type NotableWork = {
   aspect: number;
 };
 
+/**
+ * Сайт даяар ашиглагдах нэгдсэн бүтээлийн төрөл.
+ *
+ * Хоёр эх сурвалжийг нэгтгэнэ: Wikidata-аас харвест хийсэн бүтээлүүд ба
+ * гараар бичсэн онцлох бүтээлүүд. Нэрээр нь таарсан тохиолдолд нэг бичлэг
+ * болж, монгол нэр/тайлбар нь Wikidata-гийн бүтэцтэй метадатан дээр нэмэгдэнэ.
+ */
+export type Artwork = {
+  /** URL-д ашиглах ID: "starry-night" (онцлох) эсвэл "wd-Q45585" */
+  id: string;
+  /** Wikidata-гийн QID — эх сурвалжийн холбоос гаргахад (байхгүй ч болно) */
+  wikidataId: string | null;
+  slug: string;
+  /** Эх хэлээрх нэр */
+  title: string;
+  /** Монгол нэр — зөвхөн онцлох бүтээлд */
+  titleMn: string | null;
+  featured: boolean;
+  year: number | null;
+  /** Зурах үед зураач хэдэн настай байсан */
+  age: number | null;
+  /** Англи түлхүүр, ж: "landscape painting" — `genreMn`-ээр орчуулна */
+  genres: string[];
+  materials: string[];
+  collection: string | null;
+  dimsCm: { h: number; w: number } | null;
+  /** Wikimedia Commons файлын нэр — `commons(fileName, width)`-д дамжуулна */
+  fileName: string;
+  aspect: number;
+  /** Алдаршлын хэмжүүр (Wikipedia-гийн хэл хоорондын холбоосын тоо) */
+  rank: number;
+  /** Монгол тайлбар — зөвхөн онцлох бүтээлд */
+  description: string | null;
+  /** Хадгалагдаж буй газар монголоор — зөвхөн онцлох бүтээлд */
+  location: string | null;
+};
+
 export type Artist = {
   slug: string;
   nameMn: string;
@@ -55,10 +92,6 @@ export type Artist = {
   palette: Palette;
   /** Хөргийн зураг (Wikimedia Commons) */
   portrait: string;
-  /** AIC API-гийн artist_title дотор агуулагдах хэсэг (байхгүй бол null) */
-  aicMatch: string | null;
-  /** AIC хайлтын түлхүүр үг */
-  aicQuery: string | null;
   notableWorks: NotableWork[];
 };
 
@@ -69,7 +102,8 @@ export function commons(fileName: string, width = 1200): string {
   )}?width=${width}`;
 }
 
-/** AIC IIIF image_id-аас зургийн URL үүсгэнэ (хамгийн том нийтийн хэмжээ нь 843px) */
-export function aicImage(imageId: string, width = 843): string {
-  return `https://www.artic.edu/iiif/2/${imageId}/full/${width},/0/default.jpg`;
+/** `commons()`-оор үүсгэсэн URL-аас файлын нэрийг буцаан гаргана */
+export function fileNameFromCommonsUrl(url: string): string {
+  const m = url.match(/Special:FilePath\/([^?]+)/);
+  return m ? decodeURIComponent(m[1]) : "";
 }

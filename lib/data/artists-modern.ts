@@ -31,8 +31,6 @@ export const modernArtists: Artist[] = [
       muted: "#93a0b8",
     },
     portrait: commons("Vincent van Gogh - Self-Portrait - Google Art Project (454045).jpg", 600),
-    aicMatch: "van Gogh",
-    aicQuery: "Vincent van Gogh",
     notableWorks: [
       {
         id: "starry-night",
@@ -118,8 +116,6 @@ export const modernArtists: Artist[] = [
       muted: "#a3906a",
     },
     portrait: commons("Klimt.jpg", 600),
-    aicMatch: null,
-    aicQuery: null,
     notableWorks: [
       {
         id: "the-kiss",
@@ -192,8 +188,6 @@ export const modernArtists: Artist[] = [
       muted: "#a08a80",
     },
     portrait: commons("Edvard Munch 1933-2.jpg", 600),
-    aicMatch: null,
-    aicQuery: null,
     notableWorks: [
       {
         id: "the-scream",
@@ -265,8 +259,6 @@ export const modernArtists: Artist[] = [
       muted: "#8fa694",
     },
     portrait: commons("Georges Seurat 1888 (cropped).jpg", 600),
-    aicMatch: "Seurat",
-    aicQuery: "Georges Seurat",
     notableWorks: [
       {
         id: "grande-jatte",

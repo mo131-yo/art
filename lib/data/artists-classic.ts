@@ -30,8 +30,6 @@ export const classicArtists: Artist[] = [
       muted: "#8fa0b3",
     },
     portrait: commons("1665 Girl with a Pearl Earring.jpg", 600),
-    aicMatch: null,
-    aicQuery: null,
     notableWorks: [
       {
         id: "girl-with-pearl-earring",
@@ -118,8 +116,6 @@ export const classicArtists: Artist[] = [
       muted: "#94897b",
     },
     portrait: commons("Vicente López Portaña - el pintor Francisco de Goya.jpg", 600),
-    aicMatch: "Goya",
-    aicQuery: "Francisco Goya",
     notableWorks: [
       {
         id: "third-of-may",
@@ -204,8 +200,6 @@ export const classicArtists: Artist[] = [
       muted: "#8598ad",
     },
     portrait: commons("Portrait of Hokusai by Keisai Eisen.jpg", 600),
-    aicMatch: "Hokusai",
-    aicQuery: "Katsushika Hokusai",
     notableWorks: [
       {
         id: "great-wave",
@@ -278,8 +272,6 @@ export const classicArtists: Artist[] = [
       muted: "#a5906f",
     },
     portrait: commons("Joseph Mallord William Turner auto-retrato.jpg", 600),
-    aicMatch: "Turner",
-    aicQuery: "Joseph Mallord William Turner",
     notableWorks: [
       {
         id: "fighting-temeraire",

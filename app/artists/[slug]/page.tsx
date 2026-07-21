@@ -3,10 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { artists, getArtist } from "@/lib/artists";
-import { getAicArtworks } from "@/lib/aic";
+import { getArtistWorks } from "@/lib/artworks";
+import { commons } from "@/lib/data/types";
 import RevealText from "@/components/gsap/RevealText";
 import FadeIn from "@/components/gsap/FadeIn";
 import Timeline from "@/components/gsap/Timeline";
+import ArtworkCard from "@/components/browse/ArtworkCard";
 
 export function generateStaticParams() {
   return artists.map((a) => ({ slug: a.slug }));
@@ -35,7 +37,11 @@ export default async function ArtistPage({
   const artist = getArtist(slug);
   if (!artist) notFound();
 
-  const aicWorks = await getAicArtworks(artist);
+  const allWorks = await getArtistWorks(slug);
+  // Гараар бичсэн бүтээлүүд доор тусад нь дэлгэрэнгүй гардаг тул энд давхардуулахгүй.
+  // Тайлбар бичээгүй зураачдад хамгийн алдартай бүтээлүүд нь энэ хэсгийг дүүргэнэ.
+  const more = allWorks.filter((w) => !w.featured).slice(0, 12);
+  const heroWork = allWorks[0] ?? null;
   const p = artist.palette;
 
   return (
@@ -53,16 +59,19 @@ export default async function ArtistPage({
     >
       {/* HERO */}
       <section className="relative min-h-screen flex items-end md:items-center overflow-hidden pt-24">
-        <div className="absolute inset-0 opacity-20">
-          <Image
-            src={artist.notableWorks[0].image}
-            alt=""
-            fill
-            className="object-cover blur-sm scale-105"
-            priority
-          />
-          <div className="absolute inset-0 bg-linear-to-b from-bg/60 via-bg/40 to-bg" />
-        </div>
+        {heroWork && (
+          <div className="absolute inset-0 opacity-20">
+            <Image
+              src={commons(heroWork.fileName, 1280)}
+              alt=""
+              fill
+              unoptimized
+              className="object-cover blur-sm scale-105"
+              priority
+            />
+            <div className="absolute inset-0 bg-linear-to-b from-bg/60 via-bg/40 to-bg" />
+          </div>
+        )}
 
         <div className="relative z-10 grid md:grid-cols-[minmax(0,380px)_1fr] gap-10 items-center px-6 md:px-10 pb-16 md:pb-0 max-w-7xl mx-auto w-full">
           <FadeIn y={30} className="max-w-70 md:max-w-none mx-auto md:mx-0 w-full">
@@ -125,7 +134,8 @@ export default async function ArtistPage({
         <Timeline events={artist.timeline} />
       </section>
 
-      {/* ШИЛДЭГ БҮТЭЭЛҮҮД */}
+      {/* ШИЛДЭГ БҮТЭЭЛҮҮД — зөвхөн монгол тайлбар бичсэн зураачдад */}
+      {artist.notableWorks.length > 0 && (
       <section className="px-6 md:px-10 py-24 max-w-7xl mx-auto">
         <RevealText as="h2" className="font-serif-display text-3xl md:text-5xl mb-4 text-accent">
           Шилдэг бүтээлүүд
@@ -178,49 +188,34 @@ export default async function ArtistPage({
           })}
         </div>
       </section>
+      )}
 
-      {/* AIC ЦУГЛУУЛГА */}
-      {aicWorks.length > 0 && (
+      {/* БҮРЭН ЦУГЛУУЛГА */}
+      {more.length > 0 && (
         <section className="px-6 md:px-10 py-24 max-w-7xl mx-auto">
           <RevealText as="h2" className="font-serif-display text-3xl md:text-5xl mb-4 text-accent">
-            Музейн цуглуулгаас
+            Бүрэн цуглуулга
           </RevealText>
           <FadeIn y={20}>
             <p className="text-muted mb-12">
-              Чикагогийн урлагийн институтэд хадгалагдаж буй бусад бүтээлүүд.
+              {artist.nameMn} нийт {allWorks.length.toLocaleString("mn-MN")} бүтээлтэй. Хамгийн
+              алдартай нь эндээс.
             </p>
           </FadeIn>
-          <FadeIn stagger=".aic-card" className="columns-1 sm:columns-2 lg:columns-3 gap-6 [&>*]:mb-6">
-            {aicWorks.map((work) => (
-              <Link
-                key={work.id}
-                href={`/artists/${artist.slug}/artwork/aic-${work.id}`}
-                className="aic-card group block break-inside-avoid overflow-hidden rounded-lg bg-surface border border-white/5"
-              >
-                <div className="overflow-hidden">
-                  <Image
-                    src={work.image}
-                    alt={work.title}
-                    width={600}
-                    height={Math.round(600 / work.aspect)}
-                    className="w-full h-auto group-hover:scale-105 transition-transform duration-700"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-ink group-hover:text-accent transition-colors leading-snug">
-                    {work.title}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-2 text-sm text-muted">
-                    <span>{work.yearDisplay}</span>
-                    {work.ageWhenPainted && (
-                      <span className="text-xs bg-accent/15 text-accent px-2 py-0.5 rounded-full">
-                        {work.ageWhenPainted} настайдаа
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </Link>
+
+          <FadeIn stagger=".artwork-card" className="columns-1 sm:columns-2 lg:columns-3 gap-6">
+            {more.map((work) => (
+              <ArtworkCard key={work.id} work={work} width={600} />
             ))}
+          </FadeIn>
+
+          <FadeIn y={20} className="mt-14 text-center">
+            <Link
+              href={`/artists/${artist.slug}/works`}
+              className="inline-block border border-accent/60 text-accent px-8 py-3 label hover:bg-accent hover:text-bg transition-colors rounded-full"
+            >
+              Бүх {allWorks.length.toLocaleString("mn-MN")} бүтээлийг үзэх →
+            </Link>
           </FadeIn>
         </section>
       )}

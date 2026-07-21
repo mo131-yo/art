@@ -9,14 +9,38 @@
   --c-muted: #9a917e;
 }
 
+/* Editorial маягийн үндсэн хэрэгсэл: хүрээ биш, үс шиг нимгэн зураас */
+:root {
+  --c-line: color-mix(in srgb, var(--c-text) 12%, transparent);
+  --c-raise: color-mix(in srgb, var(--c-text) 4%, var(--c-bg));
+}
+
 @theme inline {
   --color-bg: var(--c-bg);
   --color-surface: var(--c-surface);
   --color-accent: var(--c-accent);
   --color-ink: var(--c-text);
   --color-muted: var(--c-muted);
+  --color-line: var(--c-line);
+  --color-raise: var(--c-raise);
   --font-serif-display: var(--font-display), Georgia, serif;
   --font-sans: var(--font-body), system-ui, sans-serif;
+
+  /* Типографийн шат — дэлгэцийн өргөнөөс хамаарч уян хатан */
+  --text-display: clamp(3.5rem, 11vw, 9rem);
+  --text-title: clamp(2rem, 5vw, 4rem);
+  --text-lede: clamp(1.05rem, 1.6vw, 1.35rem);
+}
+
+/*
+ * Сайт даяар давтагддаг жижиг том үсэгтэй шошго — цэс, фасетын нэр,
+ * метадатын түлхүүр бүгд үүнийг хэрэглэнэ.
+ */
+@utility label {
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--c-muted);
 }
 
 html {

@@ -31,8 +31,6 @@ export const renaissanceArtists: Artist[] = [
       muted: "#9a8a68",
     },
     portrait: commons("Leonardo self.jpg", 600),
-    aicMatch: null,
-    aicQuery: null,
     notableWorks: [
       {
         id: "mona-lisa",
@@ -119,8 +117,6 @@ export const renaissanceArtists: Artist[] = [
       muted: "#9c8b7c",
     },
     portrait: commons("Miguel Ángel, por Daniele da Volterra (detalle).jpg", 600),
-    aicMatch: null,
-    aicQuery: null,
     notableWorks: [
       {
         id: "david",
@@ -206,8 +202,6 @@ export const renaissanceArtists: Artist[] = [
       muted: "#8f8175",
     },
     portrait: commons("Bild-Ottavio Leoni, Caravaggio.jpg", 600),
-    aicMatch: null,
-    aicQuery: null,
     notableWorks: [
       {
         id: "calling-of-saint-matthew",
@@ -293,8 +287,6 @@ export const renaissanceArtists: Artist[] = [
       muted: "#9c8a68",
     },
     portrait: commons("Rembrandt van Rijn - Self-Portrait - Google Art Project.jpg", 600),
-    aicMatch: "Rembrandt",
-    aicQuery: "Rembrandt van Rijn",
     notableWorks: [
       {
         id: "night-watch",
