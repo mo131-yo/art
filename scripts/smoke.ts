@@ -54,6 +54,8 @@ const paths: string[] = [
   "/artists",
   "/works",
   "/movements",
+  "/favorites",
+  "/offline",
   // Шүүлтүүрийн хувилбарууд
   "/works?genre=landscape%20painting",
   "/works?featured=1&sort=old",
@@ -98,6 +100,35 @@ async function runBatch(list: string[]): Promise<Result[]> {
 }
 
 const pageResults = await runBatch(paths);
+
+// ── PWA хөрөнгүүд (HTML биш тул тусдаа шалгана) ──
+
+const ASSETS: { path: string; type: string }[] = [
+  { path: "/manifest.webmanifest", type: "application/manifest+json" },
+  { path: "/sw.js", type: "javascript" },
+  { path: "/icons/icon-192.png", type: "image/png" },
+  { path: "/icons/icon-512.png", type: "image/png" },
+  { path: "/icons/icon-maskable-512.png", type: "image/png" },
+  { path: "/icons/apple-touch-icon.png", type: "image/png" },
+];
+
+for (const asset of ASSETS) {
+  checked++;
+  try {
+    const res = await fetch(`${base}${asset.path}`);
+    const ct = res.headers.get("content-type") ?? "";
+    if (!res.ok) {
+      problems.push({ path: asset.path, status: res.status, problem: `HTTP ${res.status}` });
+      console.log(`  ✗ ${asset.path}\n      HTTP ${res.status}`);
+    } else if (!ct.includes(asset.type)) {
+      problems.push({ path: asset.path, status: res.status, problem: `буруу төрөл: ${ct}` });
+      console.log(`  ✗ ${asset.path}\n      буруу төрөл: ${ct}`);
+    }
+  } catch (err) {
+    problems.push({ path: asset.path, status: 0, problem: (err as Error).message });
+    console.log(`  ✗ ${asset.path}\n      ${(err as Error).message}`);
+  }
+}
 
 /*
  * Бүтээлийн хуудсуудыг generated JSON-оос биш, ЗУРААЧИЙН ХУУДСАН ДЭЭРХ

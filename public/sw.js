@@ -5,11 +5,15 @@
 // Next-ийн албан ёсны PWA заавар ч гараар бичихийг зөвлөдөг.
 
 const VERSION = "v1";
+/** Үндсэн бүрхүүл: цөөхөн, тогтмол, ХЭЗЭЭ Ч цэвэрлэгддэггүй (/offline энд байна) */
 const SHELL_CACHE = `art-shell-${VERSION}`;
+/** Зочилсон хуудсууд — автоматаар хуримтлагдана, тоогоор нь хязгаарлана */
+const PAGES_CACHE = `art-pages-${VERSION}`;
 const STATIC_CACHE = `art-static-${VERSION}`;
 const IMAGE_CACHE = `art-images-${VERSION}`;
+/** Хэрэглэгчийн зориуд татсан — цэвэрлэгддэггүй */
 const OFFLINE_CACHE = `art-offline-${VERSION}`;
-const CURRENT_CACHES = [SHELL_CACHE, STATIC_CACHE, IMAGE_CACHE, OFFLINE_CACHE];
+const CURRENT_CACHES = [SHELL_CACHE, PAGES_CACHE, STATIC_CACHE, IMAGE_CACHE, OFFLINE_CACHE];
 
 const OFFLINE_URL = "/offline";
 const SHELL_URLS = ["/", OFFLINE_URL, "/manifest.webmanifest", "/icons/icon-192.png"];
@@ -18,9 +22,10 @@ const SHELL_URLS = ["/", OFFLINE_URL, "/manifest.webmanifest", "/icons/icon-192.
 // `upload.wikimedia.org` руу 302 үсэргэдэг тул хоёуланг нь тооцно.
 const MEDIA_HOSTS = new Set(["commons.wikimedia.org", "upload.wikimedia.org"]);
 
-// Автоматаар кэшлэгдэх зургийн дээд тоо. Хэрэглэгчийн зориуд татсан зургууд
-// OFFLINE_CACHE-д ордог тул энэ хязгаарт хамаарахгүй.
+// Автоматаар кэшлэгдэх дээд тоо. Хэрэглэгчийн зориуд татсан зүйл
+// OFFLINE_CACHE-д ордог тул эдгээр хязгаарт хамаарахгүй.
 const IMAGE_CACHE_MAX_ENTRIES = 200;
+const PAGES_CACHE_MAX_ENTRIES = 100;
 
 /**
  * Cross-origin зургууд `crossOrigin` атрибутгүй тул no-cors горимд татагдаж,
@@ -67,19 +72,31 @@ async function trimCache(cacheName, maxEntries) {
 
 // ─────────────────── Хүсэлтийн стратегиуд ───────────────────
 
-// Навигаци: сүлжээг эхэнд, амжилтгүй бол кэшнээс (яг хуудас → эс бөгөөс /offline)
+/**
+ * Навигаци: сүлжээг эхэнд, амжилтгүй бол кэшнээс (яг хуудас → эс бөгөөс /offline).
+ *
+ * Зочилсон хуудсууд PAGES_CACHE-д хуримтлагдаж, тоогоор нь цэвэрлэгдэнэ.
+ * Тэдгээрийг SHELL_CACHE-д хийж болохгүй: тэр цэвэрлэгдэх үедээ `/offline`
+ * fallback-аа өөрөө устгачих эрсдэлтэй.
+ */
 async function handleNavigate(request) {
-  const shell = await caches.open(SHELL_CACHE);
+  const pages = await caches.open(PAGES_CACHE);
   try {
     const response = await fetch(request);
-    if (response.ok) shell.put(request, response.clone());
+    if (response.ok) {
+      pages.put(request, response.clone()).then(() => {
+        trimCache(PAGES_CACHE, PAGES_CACHE_MAX_ENTRIES);
+      });
+    }
     return response;
   } catch {
+    const shell = await caches.open(SHELL_CACHE);
     // Хэрэглэгчийн зориуд татсан хуудсууд тусдаа кэшэнд байдаг
     const offline = await caches.open(OFFLINE_CACHE);
     return (
-      (await shell.match(request)) ||
+      (await pages.match(request)) ||
       (await offline.match(request)) ||
+      (await shell.match(request)) ||
       (await shell.match(OFFLINE_URL)) ||
       new Response("Сүлжээгүй байна.", {
         status: 503,
