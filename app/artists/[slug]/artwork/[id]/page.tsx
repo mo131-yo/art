@@ -11,6 +11,8 @@ import FadeIn from "@/components/gsap/FadeIn";
 import RevealText from "@/components/gsap/RevealText";
 import ArtworkZoom from "@/components/ArtworkZoom";
 import ArtworkCard from "@/components/browse/ArtworkCard";
+import FavoriteButton from "@/components/favorites/FavoriteButton";
+import ShareButton from "@/components/ShareButton";
 
 /**
  * Бүх 26,000 бүтээлийг prerender хийвэл build хэдэн арван минут болно.
@@ -124,6 +126,28 @@ export default async function ArtworkPage({
                 <p className="text-muted italic text-lg mt-2">{work.title}</p>
               </FadeIn>
             )}
+
+            <FadeIn y={15} delay={0.55}>
+              <div className="flex flex-wrap items-center gap-3 mt-6">
+                <FavoriteButton
+                  variant="inline"
+                  work={{
+                    id: work.id,
+                    slug,
+                    artistName: artist.nameMn,
+                    title: work.title,
+                    titleMn: work.titleMn,
+                    fileName: work.fileName,
+                    aspect: work.aspect,
+                    year: work.year,
+                  }}
+                />
+                <ShareButton
+                  title={`${title} — ${artist.nameMn}`}
+                  text={`${artist.nameMn}-ийн бүтээл${work.year ? `, ${work.year}` : ""}`}
+                />
+              </div>
+            </FadeIn>
 
             <FadeIn y={20} delay={0.6}>
               <dl className="mt-8 border-t border-line">

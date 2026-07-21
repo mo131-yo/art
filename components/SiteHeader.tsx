@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import CommandPalette, { type SearchDoc } from "./CommandPalette";
+import InstallButton from "./pwa/InstallButton";
 
 const LINKS = [
   { href: "/artists", label: "Зураачид" },
   { href: "/works", label: "Бүтээлүүд" },
   { href: "/movements", label: "Хөдөлгөөн" },
+  { href: "/favorites", label: "♡ Дуртай" },
 ];
 
 /**
@@ -52,6 +54,7 @@ export default function SiteHeader({ docs }: { docs: SearchDoc[] }) {
               </Link>
             ))}
           </div>
+          <InstallButton />
           <CommandPalette docs={docs} />
         </div>
       </nav>

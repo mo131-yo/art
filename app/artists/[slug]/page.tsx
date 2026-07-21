@@ -9,6 +9,7 @@ import RevealText from "@/components/gsap/RevealText";
 import FadeIn from "@/components/gsap/FadeIn";
 import Timeline from "@/components/gsap/Timeline";
 import ArtworkCard from "@/components/browse/ArtworkCard";
+import SaveOfflineButton from "@/components/pwa/SaveOfflineButton";
 
 export function generateStaticParams() {
   return artists.map((a) => ({ slug: a.slug }));
@@ -43,6 +44,16 @@ export default async function ArtistPage({
   const more = allWorks.filter((w) => !w.featured).slice(0, 12);
   const heroWork = allWorks[0] ?? null;
   const p = artist.palette;
+
+  // Офлайнд татах жагсаалт: топ 60 бүтээлийн зураг + хуудас, зураачийн 2 хуудас.
+  // Серверт бэлдэж өгнө — client талд бүтээлийн жагсаалт байхгүй.
+  const offlineWorks = allWorks.slice(0, 60);
+  const offlineUrls = [
+    `/artists/${slug}`,
+    `/artists/${slug}/works`,
+    ...offlineWorks.map((w) => `/artists/${slug}/artwork/${w.id}`),
+    ...offlineWorks.map((w) => commons(w.fileName, 640)),
+  ];
 
   return (
     <div
@@ -106,6 +117,15 @@ export default async function ArtistPage({
             </FadeIn>
             <FadeIn y={20} delay={0.8}>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/90">{artist.tagline}</p>
+            </FadeIn>
+            <FadeIn y={20} delay={1}>
+              <div className="mt-8">
+                <SaveOfflineButton
+                  slug={slug}
+                  artistName={artist.nameMn}
+                  urls={offlineUrls}
+                />
+              </div>
             </FadeIn>
           </div>
         </div>

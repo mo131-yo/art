@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { commons, type Artwork } from "@/lib/data/types";
 import { genre } from "@/lib/data/vocab-mn";
+import { getArtist } from "@/lib/artists";
+import FavoriteButton from "@/components/favorites/FavoriteButton";
 
 type Props = {
   work: Artwork;
@@ -19,6 +21,19 @@ type Props = {
 export default function ArtworkCard({ work, artistName, width = 640, priority }: Props) {
   const label = work.titleMn ?? work.title;
   const meta = [work.year, work.genres[0] && genre(work.genres[0])].filter(Boolean).join(" · ");
+
+  // Дуртайд хадгалахад зураачийн нэр заавал хэрэгтэй — `/favorites` хуудас
+  // офлайнд серверээс дахин татаж чадахгүй.
+  const favorite = {
+    id: work.id,
+    slug: work.slug,
+    artistName: artistName ?? getArtist(work.slug)?.nameMn ?? work.slug,
+    title: work.title,
+    titleMn: work.titleMn,
+    fileName: work.fileName,
+    aspect: work.aspect,
+    year: work.year,
+  };
 
   return (
     <Link
@@ -44,6 +59,7 @@ export default function ArtworkCard({ work, artistName, width = 640, priority }:
             ◆
           </span>
         )}
+        <FavoriteButton work={favorite} />
       </div>
 
       <figcaption className="pt-3">

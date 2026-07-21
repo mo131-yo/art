@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "harvest": "bun run scripts/harvest.ts",
+    "icons": "bun run scripts/icons.tsx",
     "smoke": "bun run scripts/smoke.ts"
   },
   "dependencies": {
